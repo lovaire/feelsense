@@ -1,16 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'daily_screening_screen.dart';
-import 'weekly_screening_screen.dart';
-import 'account_screen.dart';
 
-class MainScreen extends StatefulWidget {
-  @override
-  _MainScreenState createState() => _MainScreenState();
+void main() {
+  runApp(const MyApp());
 }
 
-class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Mental Health App',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Mental Health App Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   @override
@@ -40,7 +61,13 @@ class _MainScreenState extends State<MainScreen> {
     print('Notification tapped with payload: $payload');
   }
 
-  void _showNotification() async {
+  void _incrementCounter() {
+    setState(() {
+      _counter++;
+    });
+  }
+
+  Future<void> _showNotification() async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'your_channel_id', // Ganti dengan channel ID yang sesuai
@@ -54,44 +81,45 @@ class _MainScreenState extends State<MainScreen> {
         NotificationDetails(android: androidPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
       0,
-      'Notification Title',
-      'Notification Message',
+      'Hello!',
+      'You have pushed the button this many times: $_counter',
       platformChannelSpecifics,
       payload: 'Notification payload',
     );
-  }
-
-  final List<Widget> _screens = [
-    DailyScreeningScreen(),
-    WeeklyScreeningScreen(),
-    AccountScreen(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mental Health App'),
+        title: Text(widget.title),
       ),
-      body: _screens[_currentIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showNotification,
-        tooltip: 'Show Notification',
-        child: const Icon(Icons.notifications),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text('You have pushed the button this many times:'),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
+          ],
+        ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onItemTapped,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Weekly'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: _incrementCounter,
+            tooltip: 'Increment',
+            child: const Icon(Icons.add),
+          ),
+          const SizedBox(width: 10),
+          FloatingActionButton(
+            onPressed: _showNotification,
+            tooltip: 'Show Notification',
+            child: const Icon(Icons.notifications),
+          ),
         ],
       ),
     );
