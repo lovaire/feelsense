@@ -1,33 +1,24 @@
-import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
-import '../services/auth_service.dart';
 
-class AccountScreen extends StatelessWidget {
-  final AuthService _authService = AuthService();
+class AuthService {
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  @override
-  Widget build(BuildContext context) {
-    UserModel? currentUser = _authService.getCurrentUser (); // Mendapatkan pengguna saat ini
+  // Mendapatkan pengguna saat ini sebagai UserModel
+  UserModel? getCurrentUser() {
+    User? user = _firebaseAuth.currentUser;
+    if (user != null) {
+      return UserModel(
+        username: user.displayName ?? 'Anonymous',
+        email: user.email ?? 'No email',
+        uid: '',
+      );
+    }
+    return null;
+  }
 
-    return Scaffold(
-      appBar: AppBar(title: Text('Account')),
-      body: Center(
-        child: currentUser != null ? Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Username: ${currentUser .username}'),
-            Text('Email: ${currentUser .email}'),
-            ElevatedButton(
-              onPressed: () async {
-                await _authService.signOut();
-                // Anda mungkin ingin mengarahkan pengguna kembali ke layar login setelah keluar
-                Navigator.of(context).pop(); // Kembali ke layar sebelumnya
-              },
-              child: Text('Sign Out'),
-            ),
-          ],
-        ) : Text('No user is currently signed in.'),
-      ),
-    );
+  // Metode untuk keluar dari akun
+  Future<void> signOut() async {
+    await _firebaseAuth.signOut();
   }
 }

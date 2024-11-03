@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'daily_screening_screen.dart';
-import 'weekly_screening_screen.dart';
-import 'account_screen.dart';
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MainScreen(),
+    );
+  }
+}
 
 class MainScreen extends StatefulWidget {
   @override
@@ -10,7 +16,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   @override
@@ -22,78 +27,52 @@ class _MainScreenState extends State<MainScreen> {
   Future<void> _initNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon'); // Ganti dengan nama ikon aplikasi Anda
-    const IOSInitializationSettings initializationSettingsIOS =
-        IOSInitializationSettings();
+
+    // Hanya pengaturan untuk Android yang didefinisikan
     const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
+      // Pengaturan iOS dihilangkan
     );
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onSelectNotification: onSelectNotification,
+      onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) async {
+        // Tangani saat notifikasi ditekan
+        print('Notifikasi ditekan dengan payload: ${notificationResponse.payload}');
+      },
     );
-  }
-
-  Future<void> onSelectNotification(String? payload) async {
-    // Handle notification tap
-    print('Notification tapped with payload: $payload');
-  }
-
-  void _showNotification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'your_channel_id', // Ganti dengan channel ID yang sesuai
-      'your_channel_name', // Ganti dengan nama channel yang sesuai
-      channelDescription: 'your_channel_description', // Ganti dengan deskripsi channel yang sesuai
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: false,
-    );
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      'Notification Title',
-      'Notification Message',
-      platformChannelSpecifics,
-      payload: 'Notification payload',
-    );
-  }
-
-  final List<Widget> _screens = [
-    DailyScreeningScreen(),
-    WeeklyScreeningScreen(),
-    AccountScreen(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mental Health App'),
+        title: Text('Notifikasi Flutter'),
       ),
-      body: _screens[_currentIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showNotification,
-        tooltip: 'Show Notification',
-        child: const Icon(Icons.notifications),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onItemTapped,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Weekly'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Tekan tombol di bawah untuk mengirim notifikasi!',
+              style: TextStyle(fontSize: 18),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                // Logika untuk mengirim notifikasi bisa ditambahkan di sini
+                print('Tombol untuk mengirim notifikasi ditekan!');
+              },
+              child: Text('Kirim Notifikasi'),
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+void main() {
+  runApp(MyApp());
 }

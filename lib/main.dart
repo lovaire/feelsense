@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+
 void main() {
   runApp(const MyApp());
 }
@@ -43,16 +44,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _initNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon'); // Ganti dengan nama ikon aplikasi Anda
-    const IOSInitializationSettings initializationSettingsIOS =
-        IOSInitializationSettings();
     const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
     );
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
-      onSelectNotification: onSelectNotification,
     );
   }
 
